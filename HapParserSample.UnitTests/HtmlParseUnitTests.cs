@@ -13,15 +13,21 @@ namespace HapParserSample.UnitTests
 		public void TestMethod1()
 		{
 			var fileContent = File.ReadAllText("myFile.html");
-			var doc = HtmlParse.Parse(fileContent);
-			HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("/html[1]/body[1]/img[1]");
-			nodes.Should().HaveCount(1);
-			nodes[0].Attributes.Should().HaveCount(1);
-			var attribute = nodes[0].Attributes[0];
+			HtmlDocument doc = HtmlParse.Parse(fileContent);
+			HtmlNodeCollection imgNodes = doc.DocumentNode.SelectNodes("/html[1]/body[1]/img[1]");
+			imgNodes.Should().HaveCount(1);
+			imgNodes[0].Attributes.Should().HaveCount(1);
+			var attribute = imgNodes[0].Attributes[0];
 			attribute.Name.Should().Be("alt");
 			string htmlDecodedValue = HttpUtility.HtmlDecode(attribute.Value);
-			htmlDecodedValue.Should().Be("&");
-			attribute.Value.Should().Be("&");
+			htmlDecodedValue.Should().Be("<");
+			// attribute.Value.Should().Be("<");
+
+			HtmlNodeCollection pNodes = doc.DocumentNode.SelectNodes("/html[1]/body[1]/p[1]");
+			pNodes.Should().HaveCount(1);
+			var encodedValue = pNodes[0].InnerText;
+			var decodedValue  = HttpUtility.HtmlDecode(encodedValue);
+			decodedValue.Should().Be("😁");
 		}
 	}
 }
